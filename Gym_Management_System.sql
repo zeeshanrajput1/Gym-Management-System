@@ -1,10 +1,3 @@
--- =====================================================
--- Gym Management System  (Oracle SQL)
--- Database Management System - Mid Term Project
--- Run in SQL*Plus / SQL Developer / Live SQL
--- =====================================================
-
--- Drop old tables (ignore errors the first time you run it)
 DROP TABLE attendance CASCADE CONSTRAINTS;
 DROP TABLE class_enrollment CASCADE CONSTRAINTS;
 DROP TABLE payment CASCADE CONSTRAINTS;
@@ -13,7 +6,6 @@ DROP TABLE member CASCADE CONSTRAINTS;
 DROP TABLE trainer CASCADE CONSTRAINTS;
 DROP TABLE membership_plan CASCADE CONSTRAINTS;
 
--- ---------- TABLES ----------
 CREATE TABLE membership_plan (
     plan_id         NUMBER(3)      PRIMARY KEY,
     plan_name       VARCHAR2(30)   NOT NULL UNIQUE,
@@ -84,16 +76,11 @@ CREATE TABLE attendance (
     CONSTRAINT fk_att_member FOREIGN KEY (member_id) REFERENCES member(member_id)
 );
 
-
--- ---------- DATA ----------
-
--- membership_plan (4 rows)
 INSERT INTO membership_plan VALUES (1, 'Monthly', 1, 5000, 'Gym floor access, one month');
 INSERT INTO membership_plan VALUES (2, 'Quarterly', 3, 13500, 'Gym floor access, three months');
 INSERT INTO membership_plan VALUES (3, 'Half-Yearly', 6, 25000, 'Gym floor access plus free classes');
 INSERT INTO membership_plan VALUES (4, 'Yearly', 12, 45000, 'Full access, classes and locker');
 
--- trainer (10 rows)
 INSERT INTO trainer VALUES (1, 'Kashif Mehmood', '0322-7624039', 'Weight Training', DATE '2023-11-02', 60000);
 INSERT INTO trainer VALUES (2, 'Sadia Anwar', '0341-7135241', 'Cardio', DATE '2024-10-02', 90000);
 INSERT INTO trainer VALUES (3, 'Rehan Ashraf', '0310-2441955', 'Yoga', DATE '2025-07-14', 60000);
@@ -105,7 +92,6 @@ INSERT INTO trainer VALUES (8, 'Hina Saleem', '0328-4032085', 'Spinning', DATE '
 INSERT INTO trainer VALUES (9, 'Tahir Iqbal', '0315-2634613', 'Strength and Conditioning', DATE '2023-09-23', 60000);
 INSERT INTO trainer VALUES (10, 'Mahnoor Ali', '0340-4455413', 'Nutrition Coaching', DATE '2024-08-22', 90000);
 
--- gym_class (12 rows)
 INSERT INTO gym_class VALUES (1, 1, 'Morning Weights', 'Monday', '06:00', 20);
 INSERT INTO gym_class VALUES (2, 2, 'Power Yoga', 'Tuesday', '07:00', 25);
 INSERT INTO gym_class VALUES (3, 4, 'Zumba Party', 'Wednesday', '18:00', 30);
@@ -241,7 +227,6 @@ INSERT INTO member VALUES (118, 1, 'Hamza Khan', 'M', '0311-7245099', 'hamza.kha
 INSERT INTO member VALUES (119, 1, 'Danish Mirza', 'M', '0301-6866986', 'danish.mirza@mail.com', DATE '2026-10-07', DATE '2026-11-07', 'Expired');
 INSERT INTO member VALUES (120, 1, 'Ali Chaudhry', 'M', '0314-1641493', 'ali.chaudhry@mail.com', DATE '2025-11-23', DATE '2025-12-23', 'Expired');
 
--- class_enrollment (150 rows)
 INSERT INTO class_enrollment VALUES (1, 17, 5, DATE '2026-07-14', 'Completed');
 INSERT INTO class_enrollment VALUES (2, 36, 4, DATE '2026-06-22', 'Completed');
 INSERT INTO class_enrollment VALUES (3, 37, 8, DATE '2026-09-26', 'Completed');
@@ -393,7 +378,6 @@ INSERT INTO class_enrollment VALUES (148, 118, 2, DATE '2026-09-15', 'Enrolled')
 INSERT INTO class_enrollment VALUES (149, 79, 12, DATE '2026-05-31', 'Completed');
 INSERT INTO class_enrollment VALUES (150, 84, 4, DATE '2026-03-05', 'Enrolled');
 
--- payment (150 rows)
 INSERT INTO payment VALUES (1, 18, 5000, DATE '2026-01-13', 'Cash', 'Paid');
 INSERT INTO payment VALUES (2, 23, 13500, DATE '2025-11-18', 'Card', 'Pending');
 INSERT INTO payment VALUES (3, 89, 45000, DATE '2026-07-29', 'Bank Transfer', 'Paid');
@@ -545,7 +529,6 @@ INSERT INTO payment VALUES (148, 42, 13500, DATE '2026-07-22', 'Card', 'Paid');
 INSERT INTO payment VALUES (149, 24, 13500, DATE '2026-04-27', 'Card', 'Paid');
 INSERT INTO payment VALUES (150, 116, 13500, DATE '2026-03-02', 'Easypaisa', 'Paid');
 
--- attendance (150 rows)
 INSERT INTO attendance VALUES (1, 98, DATE '2026-04-18', '08:45', '10:15');
 INSERT INTO attendance VALUES (2, 101, DATE '2026-11-12', '09:30', '11:15');
 INSERT INTO attendance VALUES (3, 88, DATE '2026-09-03', '18:15', '20:00');
@@ -699,31 +682,23 @@ INSERT INTO attendance VALUES (150, 69, DATE '2026-10-03', '19:00', '21:00');
 
 COMMIT;
 
--- Total rows inserted: 596
-
--- ---------- SAMPLE QUERIES ----------
--- 1) Total rows in each table
 SELECT 'MEMBER' AS table_name, COUNT(*) AS total FROM member
 UNION ALL SELECT 'PAYMENT', COUNT(*) FROM payment
 UNION ALL SELECT 'ATTENDANCE', COUNT(*) FROM attendance
 UNION ALL SELECT 'CLASS_ENROLLMENT', COUNT(*) FROM class_enrollment;
 
--- 2) Members with their plan name
 SELECT m.member_id, m.full_name, p.plan_name, m.status
 FROM member m JOIN membership_plan p ON m.plan_id = p.plan_id;
 
--- 3) Number of members in each class
 SELECT g.class_name, t.full_name AS trainer, COUNT(e.member_id) AS members_enrolled
 FROM gym_class g
 JOIN trainer t ON g.trainer_id = t.trainer_id
 LEFT JOIN class_enrollment e ON g.class_id = e.class_id
 GROUP BY g.class_name, t.full_name;
 
--- 4) Total money received per payment method
 SELECT method, SUM(amount) AS total_received
 FROM payment WHERE status = 'Paid' GROUP BY method;
 
--- 5) Members whose payment is still pending
 SELECT m.full_name, m.phone, p.amount
 FROM payment p JOIN member m ON p.member_id = m.member_id
 WHERE p.status = 'Pending';
